@@ -1,1 +1,1 @@
-web: sh ./target/bin/todoapp
+web: java $JAVA_OPTS -jar target/todo-app-0.0.1-SNAPSHOT-war-exec.jar

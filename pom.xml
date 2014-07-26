@@ -5,26 +5,14 @@
   <groupId>com.sankar</groupId>
   <artifactId>todo-app</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-  <packaging>jar</packaging>
-  <properties>
-    <tomcat.version>7.0.34</tomcat.version>
-  </properties>
+  <packaging>war</packaging>
   <dependencies>
   	<dependency>
-        <groupId>org.apache.tomcat.embed</groupId>
-        <artifactId>tomcat-embed-core</artifactId>
-        <version>${tomcat.version}</version>
-    </dependency>
-    <dependency>
-        <groupId>org.apache.tomcat.embed</groupId>
-        <artifactId>tomcat-embed-logging-juli</artifactId>
-        <version>${tomcat.version}</version>
-    </dependency>
-    <dependency>
-        <groupId>org.apache.tomcat.embed</groupId>
-        <artifactId>tomcat-embed-jasper</artifactId>
-        <version>${tomcat.version}</version>
-    </dependency>
+	    <groupId>javax.servlet</groupId>
+	    <artifactId>javax.servlet-api</artifactId>
+	    <version>3.0.1</version>
+	    <scope>provided</scope>
+	</dependency>
   	<dependency>
 	    <groupId>com.sun.jersey</groupId>
 	    <artifactId>jersey-servlet</artifactId>
@@ -58,28 +46,24 @@
 	            <target>1.6</target>
             </configuration>
   		</plugin>
-  		<plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>appassembler-maven-plugin</artifactId>
-            <version>1.1.1</version>
-            <configuration>
-                <assembleDirectory>target</assembleDirectory>
-                <programs>
-                    <program>
-                        <mainClass>com.sankar.todoapp.Main</mainClass>
-                        <name>todoapp</name>
-                    </program>
-                </programs>
-            </configuration>
-            <executions>
-                <execution>
-                    <phase>package</phase>
-                    <goals>
-                        <goal>assemble</goal>
-                    </goals>
-                </execution>
-            </executions>
-        </plugin>
+		<plugin>
+			<groupId>org.apache.tomcat.maven</groupId>
+			<artifactId>tomcat7-maven-plugin</artifactId>
+			<version>2.1</version>
+			<executions>
+				<execution>
+					<id>tomcat-run</id>
+					<goals>
+						<goal>exec-war-only</goal>
+					</goals>
+					<phase>package</phase>
+					<configuration>
+						<path>/</path>
+						<port>${env.PORT}</port>
+					</configuration>
+				</execution>
+			</executions>
+		</plugin>
   	</plugins>
   </build>
 </project>
