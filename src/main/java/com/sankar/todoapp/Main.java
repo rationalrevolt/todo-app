@@ -17,7 +17,7 @@ public class Main {
 
         tomcat.setPort(Integer.valueOf(webPort));
 
-        tomcat.addWebapp("/todo-app", new File(webappDirLocation).getAbsolutePath());
+        tomcat.addWebapp("/apiv1", new File(webappDirLocation).getAbsolutePath());
         System.out.println("configuring app with basedir: " + new File("./" + webappDirLocation).getAbsolutePath());
 
         tomcat.start();
