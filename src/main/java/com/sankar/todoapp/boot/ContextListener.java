@@ -33,7 +33,7 @@ public class ContextListener extends GuiceServletContextListener {
 				bind(GsonProvider.class);
 				bind(NotFoundResponseProvider.class);
 				bind(Gson.class).toInstance(new GsonBuilder().create());
-                serve("/*").with(GuiceContainer.class);
+                serve("/apiv1/*").with(GuiceContainer.class);
 			}
 		};
 	}
