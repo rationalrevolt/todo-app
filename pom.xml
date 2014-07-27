@@ -59,7 +59,7 @@
 					<phase>package</phase>
 					<configuration>
 						<path>/</path>
-						<port>${env.PORT}</port>
+						<port>80</port>
 					</configuration>
 				</execution>
 			</executions>
