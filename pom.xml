@@ -58,8 +58,8 @@
 					</goals>
 					<phase>package</phase>
 					<configuration>
-						<path>/</path>
-						<port>80</port>
+						<path>/todo-app</path>
+						<httpPort>${env.PORT}</httpPort>
 					</configuration>
 				</execution>
 			</executions>
