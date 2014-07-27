@@ -78,6 +78,7 @@ html {
 }
 
 .todoaddtitle {
+	width: 375px;
 	font-size: 25px;
 	font-weight: bolder;
 }

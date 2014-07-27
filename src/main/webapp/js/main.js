@@ -60,7 +60,7 @@ $(function () {
 	function createAddNewTodoWidget() {
 		var widget = $('<div></div>');
 		var title = $('<input type="text" class="todoaddtitle" placeholder="I want to.." tabIndex="1">');
-		var body = $('<textarea class="todoaddbody" maxlength="1000" rows="4" placeholder="Task in detail:\n1.\n2.\n3." tabIndex="2" wrap="hard">');
+		var body = $('<textarea class="todoaddbody" maxlength="1000" rows="4" placeholder="Describe you task in detail:\n1.\n2.\n3." tabIndex="2" wrap="hard">');
 		var save = $('<span class="todoadd fa fa-plus-circle fa-4"></span>');
 		
 		save.click(function() {

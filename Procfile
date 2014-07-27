@@ -1,1 +1,1 @@
-web: java $JAVA_OPTS -jar target/todo-app-0.0.1-SNAPSHOT-war-exec.jar
+web: java $JAVA_OPTS -jar target/todo-app-0.0.1-SNAPSHOT-war-exec.jar -httpport 80
