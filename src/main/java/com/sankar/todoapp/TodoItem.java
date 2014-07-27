@@ -6,7 +6,7 @@ public class TodoItem {
 	private String id;
 	private String title;
 	private String body;
-	private Boolean done;
+	private boolean done;
 	
 	public TodoItem() {}
 	
@@ -34,11 +34,11 @@ public class TodoItem {
 		this.body = body;
 	}
 	
-	public Boolean getDone() {
+	public boolean getDone() {
 		return done;
 	}
 	
-	public void setDone(Boolean done) {
+	public void setDone(boolean done) {
 		this.done = done;
 	}
 	

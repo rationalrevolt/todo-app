@@ -1,0 +1,93 @@
+@import url(http://fonts.googleapis.com/css?family=Indie+Flower);
+
+html {
+	background-image: url(../img/bg.jpg)
+}
+
+.content {
+	margin: 20px auto;
+	padding: 10px;
+}
+
+#heading {
+	margin: 25px auto;
+	min-width: 400px;
+	text-align: center;
+	font-family: 'Indie Flower', cursive;
+	font-size: 75px;
+	font-weight: bolder;
+	color: #736766;
+}
+
+#todocontainer {
+	margin: 0 auto;
+	width: 400px;
+	list-style: none
+}
+
+.todoitem {
+	clear: both;
+	font-family: 'Indie Flower', cursive;
+}
+
+.todostatus {
+	float:left;
+	color: green;
+}
+
+.todotitle {
+	font-size: 25px;
+	font-weight: bolder;
+	padding-left: 15px;
+	padding-right: 30px;
+	clear: both;
+}
+
+.todobody {
+	clear: both;
+	display: block;
+	padding-left: 30px;
+	padding-right: 30px;
+}
+
+.tododelete {
+	float: right;
+	color: red;
+}
+
+.todostatus, .tododelete {
+	margin-top: 10px;
+}
+
+.struck {
+	text-decoration: line-through 
+}
+
+.todoaddtitle, .todoaddbody {
+	font-family: 'Indie Flower', cursive;
+	float: left;
+	background: none;
+	padding: 0px;
+	border: none;
+  	border-bottom: solid 2px;
+}
+
+.todoadd {
+	margin-top: 12px;
+	float: right;
+}
+
+.todoaddtitle {
+	font-size: 25px;
+	font-weight: bolder;
+}
+
+.todoaddtitle:focus, .todoaddbody:focus {
+	outline: none;
+}
+
+.todoaddbody {
+	clear: both;
+	width: 400px;
+	margin-bottom: 20px
+}
