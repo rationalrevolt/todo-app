@@ -10,11 +10,14 @@ import com.sankar.todoapp.NotFoundException;
 
 @Singleton
 @Provider
-public class NotFoundResponseProvider implements ExceptionMapper<NotFoundException> {
+public class ExceptionResponseProvider implements ExceptionMapper<RuntimeException> {
 
 	@Override
-	public Response toResponse(NotFoundException e) {
-		return Response.status(Status.NOT_FOUND).build();
+	public Response toResponse(RuntimeException e) {
+		if (e instanceof NotFoundException)
+			return Response.status(Status.NOT_FOUND).build();
+		else
+			return Response.serverError().build();
 	}	
 	
 }
