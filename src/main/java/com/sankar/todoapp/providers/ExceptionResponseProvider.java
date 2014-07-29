@@ -6,6 +6,7 @@ import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
 import com.google.inject.Singleton;
+import com.sankar.todoapp.Message;
 import com.sankar.todoapp.NotFoundException;
 
 @Singleton
@@ -16,8 +17,11 @@ public class ExceptionResponseProvider implements ExceptionMapper<RuntimeExcepti
 	public Response toResponse(RuntimeException e) {
 		if (e instanceof NotFoundException)
 			return Response.status(Status.NOT_FOUND).build();
-		else
-			return Response.serverError().build();
+		else {
+			e.printStackTrace();
+			Message error = Message.error(e.getMessage());
+			return Response.serverError().entity(error).build();
+		}
 	}	
 	
 }

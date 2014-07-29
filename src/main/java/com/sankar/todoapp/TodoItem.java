@@ -1,5 +1,7 @@
 package com.sankar.todoapp;
 
+import java.util.Date;
+
 @GsonWritable
 public class TodoItem {
 	
@@ -7,6 +9,7 @@ public class TodoItem {
 	private String title;
 	private String body;
 	private boolean done;
+	private Date created;
 	
 	public TodoItem() {}
 	
@@ -33,13 +36,21 @@ public class TodoItem {
 	public void setBody(String body) {
 		this.body = body;
 	}
-	
+
 	public boolean getDone() {
 		return done;
 	}
 	
 	public void setDone(boolean done) {
 		this.done = done;
+	}
+	
+	public Date getCreated() {
+		return created;
+	}
+
+	public void setCreated(Date created) {
+		this.created = created;
 	}
 	
 }

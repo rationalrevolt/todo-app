@@ -1,6 +1,7 @@
 package com.sankar.todoapp.service;
 
 import java.util.Collection;
+import java.util.Date;
 
 import com.google.inject.Inject;
 import com.sankar.todoapp.TodoItem;
@@ -27,6 +28,10 @@ public class TodoServiceImpl implements TodoService {
 
 	@Override
 	public void add(TodoItem item) {
+		if(item.getCreated() == null) {
+			item.setCreated(new Date());
+		}
+		
 		dao.persist(item);
 	}
 

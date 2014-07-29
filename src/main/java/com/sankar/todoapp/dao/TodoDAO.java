@@ -2,6 +2,7 @@ package com.sankar.todoapp.dao;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import org.bson.types.ObjectId;
@@ -40,9 +41,9 @@ public class TodoDAO {
 	public void persist(TodoItem todo) {
 		DBCollection coll = getTodosCollection();
 		DBObject o = createDBOFromTodo(todo);
-		WriteResult wr = coll.insert(o);
+		coll.insert(o);
 		
-		if (wr.getN() != 1) throw new PersistException();
+		if (o.get("_id") == null) throw new PersistException();
 		
 		todo.setId(o.get("_id").toString());
 	}
@@ -64,7 +65,7 @@ public class TodoDAO {
 	
 	public void delete(TodoItem todo) {
 		DBCollection coll = getTodosCollection();
-		DBObject o = createDBOFromTodo(todo);
+		DBObject o = new BasicDBObject().append("_id", new ObjectId(todo.getId()));
 		WriteResult wr = coll.remove(o);
 		
 		if (wr.getN() == 0) throw new NotFoundException(); 
@@ -76,6 +77,7 @@ public class TodoDAO {
 		DBCollection coll = getTodosCollection();
 		DBCursor cursor = coll.find();
 		
+		cursor.sort(new BasicDBObject("created",1));
 		while (cursor.hasNext()) {
 			DBObject o = cursor.next();
 			todos.add(createTodoFromDBO(o));
@@ -95,6 +97,7 @@ public class TodoDAO {
 		todo.setTitle((String)o.get("title"));
 		todo.setBody((String)o.get("body"));
 		todo.setDone((Boolean)o.get("done"));
+		todo.setCreated((Date)o.get("created"));
 		
 		return todo;
 	}
@@ -108,6 +111,7 @@ public class TodoDAO {
 		o.put("title", todo.getTitle());
 		o.put("body", todo.getBody());
 		o.put("done", todo.getDone());
+		o.put("created", todo.getCreated());
 		
 		return o;
 	}
