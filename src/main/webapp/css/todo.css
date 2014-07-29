@@ -32,6 +32,13 @@ html {
 
 .todostatus {
 	float:left;
+}
+
+.fa-circle-thin {
+	color: red;
+}
+
+.fa-check-circle {
 	color: green;
 }
 
