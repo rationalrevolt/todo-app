@@ -1,10 +1,13 @@
 package com.sankar.todoapp;
 
+import io.searchbox.annotations.JestId;
+
 import java.util.Date;
 
 @GsonWritable
 public class TodoItem {
 	
+	@JestId
 	private String id;
 	private String title;
 	private String body;

@@ -1,41 +1,49 @@
 var todo_store = {};
-var todo_debug = {};
 
 $(function () {
+	var widgets_container = $('#widgetscontainer');
 	var todos_container = $('#todocontainer');
+	var search_container = $('#searchresults');
 	
 	init();
 	
 	function init() {
+		configureFunctionIcons({
+			create: $('#create'),
+			search: $('#search')
+		});
+		
 		$.ajax({type: 'GET',
 		 		url: 'apiv1/todos'
 		}).done(populateTodoList);
 	}
 	
-	function populateTodoList(todo_list) {
-		todos_container.empty();
-		
+	function configureFunctionIcons(icons) {
 		var newTodoItem = createAddNewTodoWidget();
-		todos_container.append(newTodoItem);
+		var searchTodoItem = createSearchWidget();
 		
+		widgets_container.append(newTodoItem);
+		widgets_container.append(searchTodoItem);
+		
+		icons.create.click(function() {
+			newTodoItem.show();
+			searchTodoItem.hide();
+		});
+		
+		icons.search.click(function() {
+			searchTodoItem.show();
+			newTodoItem.hide();
+		});
+		
+		newTodoItem.hide();
+		searchTodoItem.hide();
+	}
+	
+	function populateTodoList(todo_list) {
 		$.each(todo_list, function(i,todo_data) {
 			var todo = createTodoItemWidget(todo_data);
 			todos_container.append(todo);
 			todo_store[todo_data.id] = todo;
-		});
-	}
-	
-	function updateTodo(data,callback) {
-		$.ajax({type: 'PUT',
-				url: 'apiv1/todos/' + data.id,
-				contentType: 'application/json',
-				data: JSON.stringify(data),
-				statusCode: {
-					204: function() {
-						console.log('Updated Todo: ' + data.title);
-						callback();
-					}
-				}
 		});
 	}
 	
@@ -54,6 +62,20 @@ $(function () {
 		});
 	}
 	
+	function updateTodo(data,callback) {
+		$.ajax({type: 'PUT',
+				url: 'apiv1/todos/' + data.id,
+				contentType: 'application/json',
+				data: JSON.stringify(data),
+				statusCode: {
+					204: function() {
+						console.log('Updated Todo: ' + data.title);
+						callback();
+					}
+				}
+		});
+	}
+	
 	function deleteTodo(data,callback) {
 		$.ajax({type: 'DELETE',
 				url: 'apiv1/todos/' + data.id,
@@ -66,25 +88,32 @@ $(function () {
 		});
 	}
 	
-	function showAllTodos() {
-		$.each(todo_store, function(_,widget) {
-			widget.show();
+	function searchTodos(input) {
+		$.ajax({type: 'GET',
+				url: 'apiv1/todos/search?q=' + encodeURIComponent(input.trim()),
+				success: function(result) {
+					console.log('Search hits: ' + result.length);
+					
+					search_container.empty();
+					
+					$.each(findMatchedTodos(result), function(_, m) {
+						search_container.append(m);
+					});
+					
+					search_container.show();
+					todos_container.hide();
+				}
 		});
 	}
-	todo_debug.showAllTodos = showAllTodos;
 	
-	function hideUnmatchedTodos(match /* match is an object whose keys are ids and values as true */) {
-		showAllTodos();
-		$.each(todo_store, function(_, id) {
-			if (match[id] == undefined) {
-				$(todo_store[id]).hide();
-			}
+	function findMatchedTodos(matches /* array of ids */) {
+		return $.map(matches, function(id,_) {
+			return todo_store[id].clone();
 		});
 	}
-	todo_debug.hideUnmatchedTodos = hideUnmatchedTodos;
 	
 	function createAddNewTodoWidget() {
-		var widget = $('<div></div>');
+		var widget = $('<div id="addTodoWidget"></div>');
 		var title = $('<input type="text" class="todoaddtitle" placeholder="I want to.." tabIndex="1">');
 		var body = $('<textarea class="todoaddbody" maxlength="1000" rows="4" placeholder="Describe your task in detail:\n1.\n2.\n3." tabIndex="2" wrap="hard">');
 		var save = $('<span class="todoadd fa fa-plus-circle fa-4"></span>');
@@ -114,7 +143,30 @@ $(function () {
 		widget.append(body);
 		
 		return widget;
-	} 
+	}
+	
+	function createSearchWidget() {
+		var widget = $('<div id="searchwidget"></div>');
+		var searchbox = $('<input type="text" id="searchbox" class="searchbox" placeholder="Search.." tabIndex="1">');
+		var close = $('<span class="searchclose fa fa-times-circle fa-4"></span>')
+		
+		widget.keydown(function(ev) {
+			if(event.which == 13) {
+				searchTodos(searchbox.val());
+			}
+		});
+		
+		close.click(function() {
+			searchbox.val('');
+			search_container.hide();
+			todos_container.show();
+		});
+		
+		widget.append(searchbox);
+		widget.append(close);
+		
+		return widget;
+	}
 	
 	function createTodoItemWidget(data) {
 		var todo = $('<li class="todoitem"></td>');

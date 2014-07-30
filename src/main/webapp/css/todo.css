@@ -14,15 +14,34 @@ html {
 	min-width: 400px;
 	text-align: center;
 	font-family: 'Indie Flower', cursive;
-	font-size: 75px;
+	font-size: 50px;
 	font-weight: bolder;
 	color: #736766;
 }
 
-#todocontainer {
+#todocontainer, #widgetscontainer, #appicons, #searchresults {
 	margin: 0 auto;
 	width: 400px;
-	list-style: none
+}
+
+#todocontainer, #searchresults {
+	padding-left: 0px;
+	list-style: none;
+}
+
+#appicons {
+	margin-bottom: 20px;
+}
+
+.function {
+	padding: 5px;
+	margin-right: 5px;
+	border-radius: 3px;
+}
+
+.function:hover {
+	background-color: black;
+	color: white;
 }
 
 .todoitem {
@@ -70,7 +89,7 @@ html {
 	text-decoration: line-through 
 }
 
-.todoaddtitle, .todoaddbody {
+.todoaddtitle, .todoaddbody, .searchbox {
 	font-family: 'Indie Flower', cursive;
 	float: left;
 	background: none;
@@ -79,23 +98,22 @@ html {
   	border-bottom: solid 2px;
 }
 
-.todoadd {
+.todoadd, .searchclose {
 	margin-top: 12px;
 	float: right;
 }
 
-.todoaddtitle {
+.todoaddtitle, .searchbox {
 	width: 375px;
 	font-size: 25px;
 	font-weight: bolder;
 }
 
-.todoaddtitle:focus, .todoaddbody:focus {
+.todoaddtitle:focus, .todoaddbody:focus, .searchbox:focus {
 	outline: none;
 }
 
 .todoaddbody {
 	clear: both;
 	width: 400px;
-	margin-bottom: 20px
 }

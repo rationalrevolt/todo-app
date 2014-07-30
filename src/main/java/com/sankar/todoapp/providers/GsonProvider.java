@@ -42,12 +42,18 @@ public class GsonProvider implements MessageBodyWriter<Object>, MessageBodyReade
 
 	@Override
 	public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-		if (type.getAnnotation(GsonWritable.class) != null) return true;
+		if (type.getAnnotation(GsonWritable.class) != null) 
+			return true;
+		
 		if (Collection.class.isAssignableFrom(type) && genericType instanceof ParameterizedType) {
 			ParameterizedType ptype = (ParameterizedType)genericType;
 			Type typeParam = ptype.getActualTypeArguments()[0];
-			if (typeParam instanceof Class && ((Class<?>)typeParam).isAnnotationPresent(GsonWritable.class)) 
-				return true;
+			if (typeParam instanceof Class) {
+				if ( ((Class<?>)typeParam).equals(String.class) )
+					return true;
+				if ( ((Class<?>)typeParam).isAnnotationPresent(GsonWritable.class) ) 
+					return true;
+			}
 		}
 		return false;
 	}

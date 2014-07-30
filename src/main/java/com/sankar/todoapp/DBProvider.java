@@ -2,22 +2,23 @@ package com.sankar.todoapp;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import com.google.inject.name.Named;
 import com.mongodb.DB;
 import com.mongodb.MongoClient;
 
 public class DBProvider implements Provider<DB> {
 	
 	private MongoClient cli;
-	private DBConfig conf;
+	private String dbName;
 	
 	@Inject
-	public DBProvider(MongoClient cli, DBConfig conf) {
+	public DBProvider(MongoClient cli, @Named("MONGO_DATABASE_NAME") String dbName) {
 		this.cli = cli;
-		this.conf = conf;
+		this.dbName = dbName;
 	}
 	
 	@Override
 	public DB get() {
-		return cli.getDB(conf.getSchema());
+		return cli.getDB(dbName);
 	}
 }
