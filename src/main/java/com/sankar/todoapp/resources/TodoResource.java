@@ -22,6 +22,7 @@ import com.google.inject.Inject;
 import com.google.inject.servlet.RequestScoped;
 import com.sankar.todoapp.Message;
 import com.sankar.todoapp.TodoItem;
+import com.sankar.todoapp.service.NotificationService;
 import com.sankar.todoapp.service.SearchService;
 import com.sankar.todoapp.service.TodoService;
 
@@ -33,11 +34,13 @@ public class TodoResource {
 	
 	private TodoService todoService;
 	private SearchService searchService;
+	private NotificationService notificationService;
 	
 	@Inject
-	public TodoResource(TodoService todoService, SearchService searchService) {
+	public TodoResource(TodoService todoService, SearchService searchService, NotificationService notificationService) {
 		this.todoService = todoService;
 		this.searchService = searchService;
+		this.notificationService = notificationService;
 	}
 	
 	@GET
@@ -75,6 +78,11 @@ public class TodoResource {
 			item.setId(id);
 			todoService.update(item);
 			searchService.update(item);
+			
+			if(item.getDone()) {
+				notificationService.notifyCompleted(item);
+			}
+			
 			return null;
 		} else 
 			return Response

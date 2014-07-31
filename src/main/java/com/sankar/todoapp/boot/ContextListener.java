@@ -25,24 +25,33 @@ import com.sankar.todoapp.dao.TodoDAO;
 import com.sankar.todoapp.providers.ExceptionResponseProvider;
 import com.sankar.todoapp.providers.GsonProvider;
 import com.sankar.todoapp.resources.TodoResource;
+import com.sankar.todoapp.service.NotificationService;
+import com.sankar.todoapp.service.NotificationServiceImpl;
 import com.sankar.todoapp.service.SearchService;
 import com.sankar.todoapp.service.SearchServiceImpl;
 import com.sankar.todoapp.service.TodoService;
 import com.sankar.todoapp.service.TodoServiceImpl;
 import com.sun.jersey.guice.JerseyServletModule;
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
+import com.twilio.sdk.TwilioRestClient;
 
 public class ContextListener extends GuiceServletContextListener {
 	
 	private String mongoDatabaseName;
+	
 	private MongoClient mongoClient;
 	private JestClient jestClient;
+	private TwilioRestClient twilioClient;
+	
+	private String smsFromNumber;
+	private String smsToNumber;
 	
 	public ContextListener() {
 		Map<String,String> env = System.getenv();
 		
 		configureMongoDB(env);
 		configureSearchBox(env);
+		configureTwilio(env);
 	}
 	
 	private void configureMongoDB(Map<String,String> env) {
@@ -75,7 +84,17 @@ public class ContextListener extends GuiceServletContextListener {
 		
 		jestClient = factory.getObject();
 	}
-
+	
+	private void configureTwilio(Map<String,String> env) {
+		String twilio_account_sid = env.get("TWILIO_ACCOUNT_SID");
+		String twilio_auth_token = env.get("TWILIO_AUTH_TOKEN");
+		
+		twilioClient = new TwilioRestClient(twilio_account_sid, twilio_auth_token);
+		
+		smsFromNumber = env.get("SMS_FROM_NUMBER");
+		smsToNumber = env.get("SMS_TO_NUMBER");
+	}
+	
 	@Override
 	protected Injector getInjector() {
 		return Guice.createInjector(
@@ -89,6 +108,7 @@ public class ContextListener extends GuiceServletContextListener {
 					bind(TodoDAO.class);
 					bind(TodoService.class).to(TodoServiceImpl.class);
 					bind(SearchService.class).to(SearchServiceImpl.class);
+					bind(NotificationService.class).to(NotificationServiceImpl.class);
 					
 					bind(Gson.class).toInstance(new GsonBuilder().setPrettyPrinting().create());
 					
@@ -97,6 +117,10 @@ public class ContextListener extends GuiceServletContextListener {
 					bind(DB.class).toProvider(DBProvider.class);
 					
 					bind(JestClient.class).toInstance(jestClient);
+					
+					bind(TwilioRestClient.class).toInstance(twilioClient);
+					bindConstant().annotatedWith(Names.named("SMS_FROM_NUMBER")).to(smsFromNumber);
+					bindConstant().annotatedWith(Names.named("SMS_TO_NUMBER")).to(smsToNumber);
 					
 	                serve("/apiv1/*").with(GuiceContainer.class);
 				}
