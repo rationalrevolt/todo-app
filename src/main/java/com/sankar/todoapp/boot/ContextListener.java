@@ -7,6 +7,9 @@ import io.searchbox.client.config.HttpClientConfig;
 import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.servlet.ServletContextEvent;
 
@@ -46,12 +49,16 @@ public class ContextListener extends GuiceServletContextListener {
 	private String smsFromNumber;
 	private String smsToNumber;
 	
+	private ExecutorService executor;
+	
 	public ContextListener() {
 		Map<String,String> env = System.getenv();
 		
 		configureMongoDB(env);
 		configureSearchBox(env);
 		configureTwilio(env);
+		
+		configureExecutor();
 	}
 	
 	private void configureMongoDB(Map<String,String> env) {
@@ -95,6 +102,10 @@ public class ContextListener extends GuiceServletContextListener {
 		smsToNumber = env.get("SMS_TO_NUMBER");
 	}
 	
+	private void configureExecutor() {
+		executor = Executors.newFixedThreadPool(5);
+	}
+	
 	@Override
 	protected Injector getInjector() {
 		return Guice.createInjector(
@@ -122,6 +133,8 @@ public class ContextListener extends GuiceServletContextListener {
 					bindConstant().annotatedWith(Names.named("SMS_FROM_NUMBER")).to(smsFromNumber);
 					bindConstant().annotatedWith(Names.named("SMS_TO_NUMBER")).to(smsToNumber);
 					
+					bind(Executor.class).toInstance(executor);
+					
 	                serve("/apiv1/*").with(GuiceContainer.class);
 				}
 			}
@@ -134,6 +147,7 @@ public class ContextListener extends GuiceServletContextListener {
 		
 		mongoClient.close();
 		jestClient.shutdownClient();
+		executor.shutdown();
 	}
 
 }

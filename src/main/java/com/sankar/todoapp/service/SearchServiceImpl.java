@@ -1,5 +1,6 @@
 package com.sankar.todoapp.service;
 
+import io.searchbox.action.Action;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
 import io.searchbox.core.Delete;
@@ -8,6 +9,7 @@ import io.searchbox.core.Search;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executor;
 
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -18,20 +20,18 @@ import com.sankar.todoapp.TodoItem;
 public class SearchServiceImpl implements SearchService {
 	
 	private JestClient client;
+	private Executor executor;
 	
 	@Inject
-	public SearchServiceImpl(JestClient client) {
+	public SearchServiceImpl(JestClient client, Executor executor) {
 		this.client = client;
+		this.executor = executor;
 	}
 
 	@Override
 	public void index(TodoItem todo) {
-		try {
-			Index indexAction = new Index.Builder(todo).index("todos").type("todo").build();
-			client.execute(indexAction);
-		} catch(Exception e) {
-			throw new RuntimeException(e);
-		}
+		Index indexAction = new Index.Builder(todo).index("todos").type("todo").build();
+		executeAsync(indexAction);
 	}
 	
 	@Override
@@ -41,12 +41,8 @@ public class SearchServiceImpl implements SearchService {
 
 	@Override
 	public void delete(String id) {
-		try {
-			Delete deleteAction = new Delete.Builder(id).index("todos").type("todo").build();
-			client.execute(deleteAction);
-		} catch(Exception e) {
-			throw new RuntimeException(e);
-		}
+		Delete deleteAction = new Delete.Builder(id).index("todos").type("todo").build();
+		executeAsync(deleteAction);
 	}
 
 	@Override
@@ -69,6 +65,20 @@ public class SearchServiceImpl implements SearchService {
 		List<String> results = new ArrayList<String>();
 		for(TodoItem item : items) results.add(item.getId());
 		return results;
+	}
+	
+	private void executeAsync(final Action<?> action) {
+		//TODO: Index updates for a given TodoItem need to happen in the order of arrival
+		executor.execute(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					client.execute(action);
+				} catch(Exception e) {
+					System.err.printf("Failed to update search index, Cause: %s%n", e.getMessage());
+				}
+			}
+		});
 	}
 	
 }

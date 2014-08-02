@@ -2,6 +2,7 @@ package com.sankar.todoapp.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executor;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -21,28 +22,46 @@ public class NotificationServiceImpl implements NotificationService {
 	private String smsFrom;
 	private String smsTo;
 	
+	private Executor executor;
+	
 	@Inject
-	public NotificationServiceImpl(TwilioRestClient twilio, @Named("SMS_FROM_NUMBER") String smsFrom, @Named("SMS_TO_NUMBER") String smsTo) {
+	public NotificationServiceImpl(
+			TwilioRestClient twilio,
+			
+			@Named("SMS_FROM_NUMBER") 
+			String smsFrom, 
+			
+			@Named("SMS_TO_NUMBER") 
+			String smsTo,
+			
+			Executor executor) {
+		
 		this.twilio = twilio;
 		this.smsFrom = smsFrom;
 		this.smsTo = smsTo;
+		this.executor = executor;
 	}
 
 	@Override
-	public void notifyCompleted(TodoItem item) {
-		Account account = twilio.getAccount();
-		MessageFactory msgFactory = account.getMessageFactory();
+	public void notifyCompleted(final TodoItem item) {
+		final List<NameValuePair> params = new ArrayList<NameValuePair>();
 		
-		List<NameValuePair> params = new ArrayList<NameValuePair>();
 		params.add(new BasicNameValuePair("To", smsTo));
 		params.add(new BasicNameValuePair("From", smsFrom));
 		params.add(new BasicNameValuePair("Body", "Task complete: " + item.getTitle()));
 		
-		try {
-			msgFactory.create(params);
-		} catch (TwilioRestException e) {
-			throw new RuntimeException(e);
-		}
+		executor.execute(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					Account account = twilio.getAccount();
+					MessageFactory msgFactory = account.getMessageFactory();
+					msgFactory.create(params);
+				} catch (TwilioRestException e) {
+					System.err.printf("Failed to send SMS for completion of task ID: %s, Title: %s, Cause: %s%n", item.getId(), item.getTitle(), e.getMessage());
+				}
+			}
+		});
 	}
 
 }
