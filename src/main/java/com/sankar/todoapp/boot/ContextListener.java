@@ -13,6 +13,9 @@ import java.util.concurrent.Executors;
 
 import javax.servlet.ServletContextEvent;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.inject.Guice;
@@ -29,16 +32,15 @@ import com.sankar.todoapp.providers.ExceptionResponseProvider;
 import com.sankar.todoapp.providers.GsonProvider;
 import com.sankar.todoapp.resources.TodoResource;
 import com.sankar.todoapp.service.NotificationService;
-import com.sankar.todoapp.service.NotificationServiceImpl;
 import com.sankar.todoapp.service.SearchService;
-import com.sankar.todoapp.service.SearchServiceImpl;
 import com.sankar.todoapp.service.TodoService;
-import com.sankar.todoapp.service.TodoServiceImpl;
 import com.sun.jersey.guice.JerseyServletModule;
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
 import com.twilio.sdk.TwilioRestClient;
 
 public class ContextListener extends GuiceServletContextListener {
+	
+	private static Logger log = LogManager.getLogger(); 
 	
 	private String mongoDatabaseName;
 	
@@ -75,7 +77,10 @@ public class ContextListener extends GuiceServletContextListener {
 			MongoCredential auth = MongoCredential.createMongoCRCredential(mongo_user, mongo_schema, mongo_password.toCharArray());
 			
 			mongoClient = new MongoClient(addr,Arrays.asList(auth));
+			
+			log.info("Mongo DB configured");
 		} catch(UnknownHostException e) {
+			log.fatal("Error configuring Mongo DB", e);
 			throw new RuntimeException(e);
 		}
 	}
@@ -90,6 +95,7 @@ public class ContextListener extends GuiceServletContextListener {
 		                        .build());
 		
 		jestClient = factory.getObject();
+		log.info("SearchBox configured");
 	}
 	
 	private void configureTwilio(Map<String,String> env) {
@@ -100,10 +106,13 @@ public class ContextListener extends GuiceServletContextListener {
 		
 		smsFromNumber = env.get("SMS_FROM_NUMBER");
 		smsToNumber = env.get("SMS_TO_NUMBER");
+		
+		log.info("Twilio configured");
 	}
 	
 	private void configureExecutor() {
 		executor = Executors.newFixedThreadPool(5);
+		log.info("Executor created");
 	}
 	
 	@Override
@@ -117,9 +126,9 @@ public class ContextListener extends GuiceServletContextListener {
 					bind(ExceptionResponseProvider.class);
 					
 					bind(TodoDAO.class);
-					bind(TodoService.class).to(TodoServiceImpl.class);
-					bind(SearchService.class).to(SearchServiceImpl.class);
-					bind(NotificationService.class).to(NotificationServiceImpl.class);
+					bind(TodoService.class);
+					bind(SearchService.class);
+					bind(NotificationService.class);
 					
 					bind(Gson.class).toInstance(new GsonBuilder().setPrettyPrinting().create());
 					
@@ -148,6 +157,8 @@ public class ContextListener extends GuiceServletContextListener {
 		mongoClient.close();
 		jestClient.shutdownClient();
 		executor.shutdown();
+		
+		log.info("Shutdown complete");
 	}
 
 }
